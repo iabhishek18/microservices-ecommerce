@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package ecommerce;
+
+option go_package = "github.com/iabhishek18/microservices-ecommerce/proto";
+
+service ProductService {
+  rpc GetProduct (GetProductRequest) returns (Product);
+  rpc ListProducts (ListProductsRequest) returns (ProductList);
+  rpc CreateProduct (CreateProductRequest) returns (Product);
+  rpc UpdateStock (UpdateStockRequest) returns (StockResponse);
+}
+
+message Product {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  double price = 4;
+  int32 stock = 5;
+  string category = 6;
+  string image_url = 7;
+  bool is_active = 8;
+}
+
+message GetProductRequest { string id = 1; }
+message ListProductsRequest { int32 page = 1; int32 limit = 2; string category = 3; }
+message ProductList { repeated Product products = 1; int32 total = 2; }
+message CreateProductRequest { string name = 1; string description = 2; double price = 3; int32 stock = 4; string category = 5; }
+message UpdateStockRequest { string product_id = 1; int32 quantity_change = 2; }
+message StockResponse { string product_id = 1; int32 new_stock = 2; bool success = 3; }
