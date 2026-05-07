@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  product-service:
+    build: ./services/product
+    ports: ["50051:50051"]
+    depends_on: [postgres, redis]
+  order-service:
+    build: ./services/order
+    ports: ["50052:50052"]
+    depends_on: [postgres, kafka]
+  payment-service:
+    build: ./services/payment
+    ports: ["50053:50053"]
+    depends_on: [postgres]
+  gateway:
+    build: ./gateway
+    ports: ["8080:8080"]
+    depends_on: [product-service, order-service, payment-service]
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ecommerce
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
+    ports: ["5432:5432"]
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+    depends_on: [zookeeper]
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
